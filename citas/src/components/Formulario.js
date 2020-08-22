@@ -1,59 +1,67 @@
 import React, { Fragment, useState } from "react";
-import uuid from 'uuid/dist/v4'
+import uuid from 'uuid/dist/v4';
+import PropTypes from 'prop-types';
 
-const Formulario = ({crearCita}) => {
+const Formulario = ({ crearCita }) => {
 
-    // State Citas
-    const [cita, actualizarCita ] = useState({
-        mascota: '',
-        propietario: '',
-        fecha: '',
-        hora: '',
-        sintomas: ''
+  // State Citas
+  const [cita, actualizarCita] = useState({
+    mascota: '',
+    propietario: '',
+    fecha: '',
+    hora: '',
+    sintomas: ''
+  })
+
+  const [error, actualizarError] = useState(false);
+
+  // func
+
+  const actualizarState = e => {
+    actualizarCita({
+      ...cita, [e.target.name]: e.target.value
     })
+  }
 
-    const [error, actualizarError] = useState(false);
+  // valores
+  const { mascota, propietario, fecha, hora, sintomas } = cita;
 
-    // func
+  //envio de formulario
 
-    const actualizarState = e => {
-        actualizarCita({
-          ...cita, [e.target.name]: e.target.value
-        })
+  const submitCita = e => {
+    e.preventDefault();
+
+    // Validar
+    if (mascota.trim() === '' || propietario.trim() === '' || fecha.trim() === '' || hora.trim() === '' || sintomas.trim() === '') {
+      actualizarError(true);
+      return;
     }
 
-    // valores
-    const {mascota, propietario, fecha, hora, sintomas} = cita;
+    //actualizar error
+    actualizarError(false);
 
-    //envio de formulario
+    // Asignar ID
+    cita.id = uuid();
 
-    const submitCita = e => {
-      e.preventDefault();
-      
-      // Validar
-      if(mascota.trim() === '' || propietario.trim() === '' || fecha.trim() === '' || hora.trim() === '' || sintomas.trim() === ''){
-        actualizarError(true);
-        return;
-      }
+    // Crear Cita
+    crearCita(cita);
 
-      //actualizar error
-      actualizarError(false);
-
-      // Asignar ID
-      cita.id = uuid();
-      // Crear Cita
-
-      crearCita(cita);
-
-      // Reiniciar Form
-    }
+    // Reiniciar Form
+    actualizarCita({
+      mascota: '',
+      propietario: '',
+      fecha: '',
+      hora: '',
+      sintomas: ''
+    })
+  }
 
   return (
     <Fragment>
       <h2> Crear Citas </h2>
-      
-      { error? <p className="alerta-error"> Todos los campos son obligatorios. </p> : null }
-      
+
+      {error ? <p className="alerta-error"> Todos los campos son obligatorios. </p> : null}
+
       <form onSubmit={submitCita}>
         <label>Mascota</label>
         <input
@@ -61,8 +69,8 @@ const Formulario = ({crearCita}) => {
           name="mascota"
           className="u-full-width"
           placeholder="Nombre Mascota"
-          onChange = {actualizarState}
-          value = {mascota}
+          onChange={actualizarState}
+          value={mascota}
         />
         <label>"Dueño"</label>
         <input
@@ -70,16 +78,16 @@ const Formulario = ({crearCita}) => {
           name="propietario"
           className="u-full-width"
           placeholder="Esclavo"
-          onChange = {actualizarState}
+          onChange={actualizarState}
           value={propietario}
         />
         <label>Fecha</label>
-        <input type="date" name="fecha" className="u-full-width" onChange = {actualizarState} value = {fecha}/>
+        <input type="date" name="fecha" className="u-full-width" onChange={actualizarState} value={fecha} />
         <label>Hora</label>
-        <input type="time" name="hora" className="u-full-width" onChange = {actualizarState} value = {hora}/>
+        <input type="time" name="hora" className="u-full-width" onChange={actualizarState} value={hora} />
 
         <label>Sintomas</label>
-        <textarea name="sintomas" className="u-full-width" onChange = {actualizarState} value = {sintomas}></textarea>
+        <textarea name="sintomas" className="u-full-width" onChange={actualizarState} value={sintomas}></textarea>
 
         <button type="submit" className="u-full-width button-primary">
           Agregar Cita
@@ -88,5 +96,9 @@ const Formulario = ({crearCita}) => {
     </Fragment>
   );
 };
+
+Formulario.propTypes = {
+  crearCita: PropTypes.func.isRequired
+}
 
 export default Formulario;

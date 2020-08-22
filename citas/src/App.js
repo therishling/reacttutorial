@@ -1,10 +1,28 @@
-import React,{ Fragment, useState } from 'react';
+import React, { Fragment, useState, useEffect } from 'react';
 import Formulario from './components/Formulario';
+import Cita from './components/Cita';
 
 function App() {
 
+
+  // citas en local storage
+  let citasIniciales = JSON.parse(localStorage.getItem('citas'));
+
+  if (!citasIniciales) {
+    citasIniciales = [];
+  }
   // arreglo de citas wey
-  const [citas, actualizarCitas] = useState([])
+  const [citas, actualizarCitas] = useState(citasIniciales);
+
+  // useeffect
+  useEffect(() => {
+    let citasIniciales = JSON.parse(localStorage.getItem('citas'));
+    if (citasIniciales) {
+      localStorage.setItem('citas', JSON.stringify(citas));
+    } else {
+      localStorage.setItem('citas', JSON.stringify([]));
+    }
+  }, [citas])
 
   // crear cita
   const crearCita = cita => {
@@ -12,6 +30,17 @@ function App() {
       ...citas, cita
     ])
   }
+
+
+  // eliminar cita
+  const eliminarCita = id => {
+    const nuevasCitas = citas.filter(cita => cita.id !== id);
+
+    actualizarCitas(nuevasCitas);
+  }
+  // mensaje xd
+  const titulo = citas.length === 0 ? "No hay citas" : "Administra tus citas"
+
   return (
 
     <Fragment>
@@ -20,11 +49,18 @@ function App() {
         <div className="row">
           <div className="one-half column">
             <Formulario
-            crearCita = {crearCita}
+              crearCita={crearCita}
             />
           </div>
           <div className="one-half column">
-            
+            <h2>{titulo}</h2>
+            {citas.map(cita => (
+              <Cita
+                key={cita.id}
+                cita={cita}
+                eliminarCita={eliminarCita}
+              />
+            ))}
           </div>
         </div>
       </div>
